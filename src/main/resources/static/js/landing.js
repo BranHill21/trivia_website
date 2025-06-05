@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     index++;
     localStorage.setItem(LS_I, index);
-    setTimeout(renderQuestion, 600);             // next Q after brief pause
+    setTimeout(renderQuestion, 1000);             // next Q after brief pause
   }
 
   /* ---------- Ad helpers ---------- */

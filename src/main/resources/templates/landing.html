@@ -2,14 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Daily Trivia</title>
-  <link rel="stylesheet" href="/css/landing.css">
-  <script src="/js/landing.js" defer></script>
+  <title>Trivia Time!</title>
+
+  <!-- CSS -------------------------------------------------------------->
+  <link rel="stylesheet" href="/css/landing.css" />
+
+  <!-- Google Publisher Tag (GPT) for interstitial + rewarded ----------->
+  <!-- Replace ad-unit paths `/1234567/...` with your own IDs -->
+  <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+  
+
+  <!-- AdSense / GPT banner (sticky footer) ---------------------------->
+  <!-- Replace ca-pub / data-ad-slot with your real values -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5266407068980390"
        crossorigin="anonymous"></script>
+
+  <script src="/js/landing.js" defer></script>
 </head>
+
 <body>
   <h1>Trivia Time!</h1>
+
+  <!-- quiz container -->
   <div id="quiz"></div>
+
+  <!-- “New set” button (gated by rewarded ad) -->
+  <button id="new-set">New Set</button>
+
+  <!-- sticky banner ad (90 px high) -->
+  <ins class="adsbygoogle"
+       style="display:block;
+              width:100%;
+              height:90px;
+              position:fixed;
+              bottom:0;
+              left:0;
+              z-index:1000;"
+       data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+       data-ad-slot="1234567890"
+       data-ad-format="horizontal"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </body>
 </html>
