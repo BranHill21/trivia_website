@@ -9,11 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.example.demo.helpers.Question;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
+@Service
 public class TriviaAPIService {
 	private static final String API_BASE = "https://opentdb.com/api.php";
     private final HttpClient http = HttpClient.newHttpClient();

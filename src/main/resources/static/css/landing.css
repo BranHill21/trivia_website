@@ -1,0 +1,17 @@
+body { 
+	font-family: sans-serif; 
+	max-width: 40rem; 
+	margin: 2rem auto; 
+}
+     .question { 
+		margin-bottom: 2rem; 
+	}
+     .answers button { 
+		margin: .25rem .5rem .25rem 0; 
+	}
+     .correct   { 
+		background: #22c55e; color: white; 
+	}
+     .incorrect { 
+		background: #ef4444; color: white; 
+	}
