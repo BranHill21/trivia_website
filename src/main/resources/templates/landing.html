@@ -2,43 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>   <!-- mobile viewport -->
+
   <title>Trivia Time!</title>
 
-  <!-- CSS -------------------------------------------------------------->
-  <link rel="stylesheet" href="/css/landing.css" />
+  <!-- MAIN CSS -->
+  <link rel="stylesheet" href="/css/landing.css"/>
 
-  <!-- Google Publisher Tag (GPT) for interstitial + rewarded ----------->
-  <!-- Replace ad-unit paths `/1234567/...` with your own IDs -->
+  <!-- GPT (rewarded + interstitial) – replace with your own paths -->
   <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
-  
 
-  <!-- AdSense / GPT banner (sticky footer) ---------------------------->
-  <!-- Replace ca-pub / data-ad-slot with your real values -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5266407068980390"
-       crossorigin="anonymous"></script>
+  <!-- AdSense base (banner) – replace ca-pub ID -->
+  <script async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5266407068980390"
+          crossorigin="anonymous"></script>
 
+  <!-- APP SCRIPT -->
   <script src="/js/landing.js" defer></script>
 </head>
 
 <body>
-  <h1>Trivia Time!</h1>
+	<header class="topbar">
+	  <h1>Trivia Time!</h1>
 
-  <!-- quiz container -->
-  <div id="quiz"></div>
+	  <!-- DARK-MODE TOGGLE -->
+	  <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode">
+	    <span class="icon-moon"></span>
+	  </button>
+	</header>
 
-  <!-- “New set” button (gated by rewarded ad) -->
-  <button id="new-set">New Set</button>
+  <!-- QUIZ CONTAINER -->
+  <main id="quiz"></main>
 
-  <!-- sticky banner ad (90 px high) -->
+  <!-- “NEW SET” BUTTON -->
+  <button id="new-set" class="action">New&nbsp;Set</button>
+
+  <!-- STICKY BANNER AD (replace placeholders) -->
   <ins class="adsbygoogle"
-       style="display:block;
-              width:100%;
-              height:90px;
-              position:fixed;
-              bottom:0;
-              left:0;
-              z-index:1000;"
-       data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+       style="display:block;width:100%;height:90px;position:fixed;bottom:0;left:0;z-index:1000;"
+       data-ad-client="ca-pub-5266407068980390"
        data-ad-slot="1234567890"
        data-ad-format="horizontal"></ins>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>

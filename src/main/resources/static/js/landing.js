@@ -1,36 +1,51 @@
 /*  src/main/resources/static/js/landing.js
- *  =================================================
- *  • Persists the current question set & index in localStorage
- *  • Gates each NEW set behind a rewarded ad
- *  • Shows an interstitial every 10 answered questions
- *  • Works even if GPT / ads aren’t wired yet (graceful fallback)
- *  ------------------------------------------------- */
+ *  =============================================================
+ *  • Persists quiz in localStorage
+ *  • Rewarded-ad gate for new sets
+ *  • Interstitial every 10 answers
+ *  • Dark-mode toggle (auto + manual)
+ *  • “50-50” hint button – removes one wrong answer once per Q
+ *  • Highlights all answers after selection
+ *  ============================================================= */
 
 document.addEventListener('DOMContentLoaded', async () => {
+	/* ---------- THEME -------- */
+	const html = document.documentElement;
+	const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	const savedTheme  = localStorage.getItem('theme'); // 'light' | 'dark' | null
+
+	if ((savedTheme ?? (prefersDark ? 'dark' : 'light')) === 'dark') {
+	  html.classList.add('dark');
+	}
+	document.getElementById('theme-toggle').addEventListener('click', () => {
+	  const dark = html.classList.toggle('dark');
+	  localStorage.setItem('theme', dark ? 'dark' : 'light');
+	});
+
   /* ---------- constants & helpers ---------- */
   const LS_Q     = 'quiz.questions';
   const LS_I     = 'quiz.index';
   const LS_ULOCK = 'quiz.unlocked';
-  const AMOUNT   = 3;                 // questions per set
-  const INTERSTITIAL_EVERY = 10;      // answered before interstitial
+  const AMOUNT   = 3;
+  const INTERSTITIAL_EVERY = 10;
 
-  const root     = document.getElementById('quiz');
-  const btnNew   = document.getElementById('new-set');
-  let questions  = loadQuestions();
-  let index      = +localStorage.getItem(LS_I) || 0;
-  let answered   = 0;                 // session-only counter
+  const root   = document.getElementById('quiz');
+  const btnNew = document.getElementById('new-set');
+  let questions = loadQuestions();
+  let index     = +localStorage.getItem(LS_I) || 0;
+  let answered  = 0;
 
   /* ---------- initial load ---------- */
   if (!questions.length) {
-    questions = await fetchQuestions(AMOUNT);   // first set is free
+    questions = await fetchQuestions(AMOUNT);
     saveQuestions(questions);
   }
   renderQuestion();
 
-  /* ---------- “New set” button ---------- */
+  /* ---------- new-set button ---------- */
   btnNew.onclick = async () => {
     if (localStorage.getItem(LS_ULOCK) !== 'true') {
-      await showRewardedAd();                   // gate behind rewarded
+      await showRewardedAd();
       localStorage.setItem(LS_ULOCK, 'true');
     }
     questions = await fetchQuestions(AMOUNT);
@@ -46,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return res.json();
   }
 
-  /* ---------- persistence ---------- */
+  /* ---------- persistence helpers ---------- */
   function saveQuestions(qs) {
     localStorage.setItem(LS_Q, JSON.stringify(qs));
     localStorage.setItem(LS_I, '0');
@@ -57,52 +72,75 @@ document.addEventListener('DOMContentLoaded', async () => {
     return raw ? JSON.parse(raw) : [];
   }
 
-  /* ---------- UI render ---------- */
+  /* ---------- render single question ---------- */
   function renderQuestion() {
-    root.innerHTML = '';                         // clear previous
+    root.innerHTML = '';
     if (index >= questions.length) {
-      root.innerHTML = '<p>All done! Click “New set”.</p>';
+      root.innerHTML = '<p class="text-sub">All done! Click “New Set”.</p>';
       return;
     }
 
     const q = questions[index];
-    const wrapper = document.createElement('div');
-    wrapper.className = 'question';
-    wrapper.innerHTML = `<h3>Q${index + 1}. ${q.question}</h3>`;
-
-    // shuffle answers
-    const answers = [q.correctAnswer, ...q.incorrectAnswers]
-                    .sort(() => Math.random() - 0.5);
+    const card = document.createElement('div');
+    card.className = 'question';
+    card.innerHTML = `<h3>Q${index + 1}. ${q.question}</h3>`;
 
     const btnBox = document.createElement('div');
     btnBox.className = 'answers';
 
+    /* shuffle answers */
+    const answers = [q.correctAnswer, ...q.incorrectAnswers]
+      .sort(() => Math.random() - 0.5);
+
     answers.forEach(ans => {
       const btn = document.createElement('button');
       btn.textContent = ans;
-      btn.onclick = () => handleClick(btn, ans === q.correctAnswer);
+      btn.onclick = () => handleClick(btn, ans === q.correctAnswer, btnBox, q);
       btnBox.appendChild(btn);
     });
 
-    wrapper.appendChild(btnBox);
-    root.appendChild(wrapper);
+    /* hint button (50-50)  */
+    if (q.incorrectAnswers.length > 1) {
+      const hint = document.createElement('button');
+      hint.className = 'hint';
+      hint.textContent = 'Give me a hint';
+      hint.onclick = () => {
+        const wrongBtns = [...btnBox.children].filter(
+          b => !q.correctAnswer.includes(b.textContent) && !b.dataset.removed
+        );
+        if (wrongBtns.length) {
+          const remove = wrongBtns[0];
+          remove.style.visibility = 'hidden';
+          remove.dataset.removed = 'true';
+          hint.disabled = true;
+        }
+      };
+      card.appendChild(hint);
+    }
+
+    card.appendChild(btnBox);
+    root.appendChild(card);
   }
 
   /* ---------- answer handler ---------- */
-  function handleClick(button, isCorrect) {
-    if (button.parentElement.classList.contains('done')) return; // already answered
+  function handleClick(chosenBtn, isCorrect, btnBox, q) {
+    if (btnBox.classList.contains('done')) return; // already answered
 
-    button.classList.add(isCorrect ? 'correct' : 'incorrect');
-    button.parentElement.classList.add('done');
-    button.parentElement.querySelectorAll('button')
-          .forEach(b => (b.disabled = true));
+    /* highlight all buttons */
+    [...btnBox.children].forEach(b => {
+      const correct = b.textContent === q.correctAnswer;
+      b.classList.add(correct ? 'correct' : 'incorrect');
+      b.disabled = true;
+    });
+    chosenBtn.classList.add('chosen'); // emphasise user choice
+    btnBox.classList.add('done');
 
     answered++;
     if (answered % INTERSTITIAL_EVERY === 0) showInterstitialAd();
 
     index++;
     localStorage.setItem(LS_I, index);
-    setTimeout(renderQuestion, 1000);             // next Q after brief pause
+    setTimeout(renderQuestion, 1200);
   }
 
   /* ---------- Ad helpers ---------- */
@@ -110,13 +148,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function showRewardedAd() {
     return new Promise(res => {
-      // If GPT rewarded slot is configured, trigger it
       if (window.googletag && window.rewardedSlot) {
         _rewardResolve = res;
         googletag.cmd.push(() => googletag.pubads().refresh([rewardedSlot]));
       } else {
-        console.warn('Rewarded ad not configured – auto-continuing');
-        res();                                   // fallback: just continue
+        console.warn('Rewarded ad not configured – auto-continue');
+        res();
       }
     });
   }
@@ -124,21 +161,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showInterstitialAd() {
     if (window.googletag && window.interstitialSlot) {
       googletag.cmd.push(() =>
-          googletag.pubads().refresh([interstitialSlot]));
-    } else {
-      console.info('Interstitial slot not ready');
+        googletag.pubads().refresh([interstitialSlot]));
     }
   }
 
-  /* Hook rewarded close event (if GPT present) */
   if (window.googletag) {
     googletag.cmd.push(() => {
       if (window.rewardedSlot) {
         rewardedSlot.addEventListener('rewardedSlotClosed', () => {
-          if (typeof _rewardResolve === 'function') {
-            _rewardResolve();
-            _rewardResolve = null;
-          }
+          if (_rewardResolve) _rewardResolve(), _rewardResolve = null;
         });
       }
     });
