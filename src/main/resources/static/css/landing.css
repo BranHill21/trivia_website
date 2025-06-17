@@ -1,17 +1,173 @@
-body { 
-	font-family: sans-serif; 
-	max-width: 40rem; 
-	margin: 2rem auto; 
+/* =========================================================
+   landing.css   –  Beautiful trivia page with light/dark
+   ========================================================= */
+
+/* ---------- 1. COLOR PALETTE (CSS variables) ------------- */
+:root {
+  --bg      : #fafafa;
+  --bg-card : #ffffff;
+  --text    : #1e1e1e;
+  --text-sub: #555;
+  --accent  : #2563eb;   /* blue-600 */
+  --accent-t: #1d4ed8;   /* tapped/hover */
+  --green   : #22c55e;
+  --red     : #ef4444;
+  --border  : #e5e7eb;
+  --shadow  : 0 1px 3px rgba(0,0,0,.1),
+              0 1px 2px rgba(0,0,0,.06);
 }
-     .question { 
-		margin-bottom: 2rem; 
-	}
-     .answers button { 
-		margin: .25rem .5rem .25rem 0; 
-	}
-     .correct   { 
-		background: #22c55e; color: white; 
-	}
-     .incorrect { 
-		background: #ef4444; color: white; 
-	}
+
+/* Dark-mode overrides via prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg      : #111827;
+    --bg-card : #1f2937;
+    --text    : #f3f4f6;
+    --text-sub: #9ca3af;
+    --accent  : #3b82f6;
+    --accent-t: #60a5fa;
+    --green   : #4ade80;
+    --red     : #f87171;
+    --border  : #374151;
+    --shadow  : 0 1px 4px rgba(0,0,0,.6);
+  }
+}
+
+/* Manual toggle: add .dark on <html> */
+html.dark {
+  --bg      : #111827;
+  --bg-card : #1f2937;
+  --text    : #f3f4f6;
+  --text-sub: #9ca3af;
+  --accent  : #3b82f6;
+  --accent-t: #60a5fa;
+  --green   : #4ade80;
+  --red     : #f87171;
+  --border  : #374151;
+  --shadow  : 0 1px 4px rgba(0,0,0,.6);
+}
+
+/* ---------- 2. BASE LAYOUT ------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body {
+  margin   : 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background  : var(--bg);
+  color       : var(--text);
+  line-height : 1.6;
+  min-height  : 100vh;
+  padding-bottom: 110px;          /* leave space for sticky banner */
+  display     : flex;
+  flex-direction: column;
+  align-items : center;
+}
+
+h1 {
+  margin: 2rem 0 1rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+}
+
+/* ---------- 3. QUESTION CARD ------------------------------ */
+#quiz {
+  width: 100%;
+  max-width: 680px;
+  padding: 0 1rem;
+}
+
+.question {
+  background   : var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding      : 1.5rem 1.25rem 1rem;
+  margin-bottom: 1.75rem;
+  box-shadow   : var(--shadow);
+  transition   : transform .15s ease, box-shadow .15s ease;
+}
+
+.question:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+
+.question h3 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* ---------- 4. ANSWER BUTTONS ----------------------------- */
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.answers button {
+  flex: 1 1 calc(50% - .75rem);
+  padding: .5rem .75rem;
+  border: 2px solid var(--accent);
+  border-radius: .5rem;
+  font-size: 1rem;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background .15s, color .15s, transform .12s;
+}
+
+.answers button:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.answers button:active {
+  transform: scale(.97);
+}
+
+.answers button.correct {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.answers button.incorrect {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+/* ---------- 5. NEW-SET ACTION BUTTON ---------------------- */
+#new-set {
+  padding: .65rem 1.2rem;
+  font-size: 1.05rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: .65rem;
+  cursor: pointer;
+  margin: 1rem 0 2rem;
+  box-shadow: var(--shadow);
+  transition: background .15s, transform .12s;
+}
+
+#new-set:hover { background: var(--accent-t); }
+#new-set:active { transform: scale(.97); }
+
+/* ---------- 6. STICKY FOOTER BANNER AD ------------------- */
+.adsbygoogle {
+  /* styles mostly inline in HTML; here we keep it minimal */
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+
+/* ---------- 7. UTILITY ----------------------------------- */
+.text-sub { color: var(--text-sub); }
+
+@media (max-width: 480px) {
+  .answers button { flex: 1 1 100%; }
+}
