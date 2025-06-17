@@ -1,8 +1,8 @@
 package com.example.demo.helpers;
 
-import java.util.ArrayList;
-
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.text.StringEscapeUtils;
 
 /*
  * Class for holding and interacting with questions pulled from API or created manually.
@@ -14,11 +14,14 @@ public class Question {
 	protected String type;
 	protected String difficulty;
 	protected String correctAnswer;
-	protected ArrayList<String> incorrectAnswers;
+	protected List<String> incorrectAnswers;
+	
+	/* ------------- helpers ------------------ */
+    private static String de(String s) { return s == null ? null : StringEscapeUtils.unescapeHtml4(s); }
 	
 	public Question () {}
 	
-	public Question (String newQuestion, String newCategory, String newType, String newDifficulty, String newCorrectAnswer, ArrayList<String> newIncorrectAnswers) {
+	public Question (String newQuestion, String newCategory, String newType, String newDifficulty, String newCorrectAnswer, List<String> newIncorrectAnswers) {
 		question = newQuestion;
 		category = newCategory;
 		type = newType;
@@ -55,56 +58,25 @@ public class Question {
 		return output;
 	}
 	
-	/*
-	 * Getters and Setters
-	 */
-	public String getQuestion() {
-		return question;
-	}
+	/* ------------- getters ------------------ */
+    public String getQuestion()            { return de(question); }
+    public String getCategory()            { return de(category); }
+    public String getType()                { return de(type); }
+    public String getDifficulty()          { return de(difficulty); }
+    public String getCorrectAnswer()       { return de(correctAnswer); }
+    public List<String> getIncorrectAnswers() {
+        return incorrectAnswers == null ? List.of()
+               : incorrectAnswers.stream().map(Question::de).toList();
+    }
 
-	public void setQuestion(String question) {
-		this.question = question;
-	}
+    /* ------------- setters (needed by Jackson)  */
+    public void setQuestion(String q)                   { this.question = q; }
+    public void setCategory(String c)                   { this.category = c; }
+    public void setType(String t)                       { this.type = t; }
+    public void setDifficulty(String d)                 { this.difficulty = d; }
+    public void setCorrectAnswer(String a)              { this.correctAnswer = a; }
+    public void setIncorrectAnswers(List<String> list)  { this.incorrectAnswers = list; }
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getDifficulty() {
-		return difficulty;
-	}
-
-	public void setDifficulty(String difficulty) {
-		this.difficulty = difficulty;
-	}
-
-	public String getCorrectAnswer() {
-		return correctAnswer;
-	}
-
-	public void setCorrectAnswer(String correctAnswer) {
-		this.correctAnswer = correctAnswer;
-	}
-
-	public ArrayList<String> getIncorrectAnswers() {
-		return incorrectAnswers;
-	}
-
-	public void setIncorrectAnswers(ArrayList<String> incorrectAnswers) {
-		this.incorrectAnswers = incorrectAnswers;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
 	
 	
 }

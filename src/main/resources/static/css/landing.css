@@ -232,5 +232,5 @@ h1 {
 
 /* keep mobile friendliness */
 @media (max-width: 480px) {
-  .hint { width: 100%; margin-left: 0; }
+  .hint { width: 60%; margin-left: auto; margin-right: auto;}
 }

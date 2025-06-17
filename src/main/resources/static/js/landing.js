@@ -104,17 +104,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const hint = document.createElement('button');
       hint.className = 'hint';
       hint.textContent = 'Give me a hint';
-      hint.onclick = () => {
-        const wrongBtns = [...btnBox.children].filter(
-          b => !q.correctAnswer.includes(b.textContent) && !b.dataset.removed
-        );
-        if (wrongBtns.length) {
-          const remove = wrongBtns[0];
-          remove.style.visibility = 'hidden';
-          remove.dataset.removed = 'true';
-          hint.disabled = true;
-        }
-      };
+	  hint.onclick = () => {
+	    const wrongBtns = [...btnBox.children].filter(
+	      b => b.textContent !== q.correctAnswer && !b.dataset.removed
+	    );
+	    if (wrongBtns.length) {
+	      /* choose random wrong button */
+	      const remove = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
+	      remove.style.visibility = 'hidden';
+	      remove.dataset.removed = 'true';
+	      hint.disabled = true;
+	    }
+	  };
+
       card.appendChild(hint);
     }
 
