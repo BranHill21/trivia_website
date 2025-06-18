@@ -61,16 +61,36 @@ h1 {
 /* ---------- 3. QUESTION CARD ------------------------------ */
 #quiz {
   width: 100%;
-  max-width: 680px;
-  padding: 0 1rem;
+  max-width: 960px;
+  padding: 0 1.5rem;
 }
+
+/* medium desktops and up (≥ 768 px) — fill 75 % of viewport */
+@media (min-width: 768px) {
+  #quiz {
+    min-height: 55vh;       /* always use 75 % of screen height */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  /* Stretch every card, keep padding */
+    .question {
+      min-height: 55vh;            /* fills most of the 75 vh quiz area  */
+      display: flex;
+      flex-direction: column;      /* so we can push answers down */
+    }
+
+    /* Push the answer buttons toward the bottom of the card */
+    .answers { margin-top: auto; }
+  }
 
 .question {
   background   : var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
-  padding      : 1.5rem 1.25rem 1rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 2.25rem;
+      padding: 2rem 1.75rem 1.25rem;
   box-shadow   : var(--shadow);
   transition   : transform .15s ease, box-shadow .15s ease;
 }
@@ -233,4 +253,37 @@ h1 {
 /* keep mobile friendliness */
 @media (max-width: 480px) {
   .hint { width: 60%; margin-left: auto; margin-right: auto;}
+}
+
+/* ===========================================================
+   MOBILE FIX – keep “New Set” above the banner
+   =========================================================== */
+@media (max-width: 480px) {
+
+  /* 1. Re-pad the page so content never hides under the ad */
+  body { padding-bottom: 0px; }   /* banner 90 px + button 60 px + gap */
+
+  /* 2. Pin the New-Set button just above the ad */
+  #new-set {
+    width: calc(100% - 3rem);       /* leave side gutters */
+    max-width: 320px;
+    z-index: 999;                   /* above other content, below modal ads */
+  }
+
+  /* 3. Tweak hint button to avoid overlap when expanded list is short */
+  .hint { margin-bottom: 1.5rem; }
+  
+  h1 {
+    margin: 0rem 0 0rem;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+  }
+  
+  .question h3 {
+    margin: 0 0 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
 }
