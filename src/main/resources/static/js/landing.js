@@ -20,6 +20,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const d = html.classList.toggle('dark');
     localStorage.setItem('theme', d ? 'dark' : 'light');
   });
+  
+  /* ----- slide-out menu toggle & overlay ----- */
+  const menuBtn  = document.getElementById('menu-btn');
+  const sideMenu = document.getElementById('side-menu');
+  const overlay  = document.getElementById('menu-overlay');
+
+  function openMenu(){
+    sideMenu.classList.add('open');
+    overlay.classList.add('show');
+  }
+  function closeMenu(){
+    sideMenu.classList.remove('open');
+    overlay.classList.remove('show');
+  }
+
+  menuBtn.addEventListener('click', () =>
+    sideMenu.classList.contains('open') ? closeMenu() : openMenu()
+  );
+
+  overlay.addEventListener('click', closeMenu);       // tap anywhere to close
+  sideMenu.querySelectorAll('a').forEach(link =>
+    link.addEventListener('click', closeMenu)         // tap a link → close
+  );
 
   /* ---------- CONSTANTS ----------------------------------- */
   const AMOUNT        = 3;
@@ -155,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    setTimeout(renderQuestion, 1200);
+    setTimeout(renderQuestion, 1500);
   }
 
   /* ---------- START A NEW SET ------------------------------------ */

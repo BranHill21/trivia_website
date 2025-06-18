@@ -10,4 +10,28 @@ public class ViewController {
 	{
 		return "landing";
 	}
+	
+	@GetMapping("/about")
+	public String getAbout()
+	{
+		return "about";
+	}
+	
+	@GetMapping("/privacy")
+	public String getPrivacy()
+	{
+		return "privacy";
+	}
+	
+	@GetMapping("/terms")
+	public String getTerms()
+	{
+		return "terms";
+	}
+	
+	@GetMapping("/contact")
+	public String getContact()
+	{
+		return "contact";
+	}
 }
