@@ -5,8 +5,8 @@
 /* ---------- 1. COLOR PALETTE (CSS variables) ------------- */
 /* ---------- 1. COLOR PALETTE (lighter light-mode) ---------- */
 :root {
-  --bg      : #fdfdfd;   /* was #fafafa */
-  --bg-card : #ffffff;
+  --bg      : rgb(240, 240, 240);   /* was #fafafa */
+  --bg-card : rgb(205, 205, 205);
   --text    : #222;      /* was #1e1e1e */
   --text-sub: #666;      /* a hair lighter */
   --accent  : #3182ce;   /* slightly softer than #2563eb */
@@ -52,7 +52,7 @@ body {
 
 h1 {
   margin: 2rem 0 1rem;
-  font-size: 2.25rem;
+  font-size: 3rem;
   font-weight: 700;
   color: var(--accent);
   text-align: center;
@@ -65,25 +65,7 @@ h1 {
   padding: 0 1.5rem;
 }
 
-/* medium desktops and up (≥ 768 px) — fill 75 % of viewport */
-@media (min-width: 768px) {
-  #quiz {
-    min-height: 55vh;       /* always use 75 % of screen height */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-  
-  /* Stretch every card, keep padding */
-    .question {
-      min-height: 55vh;            /* fills most of the 75 vh quiz area  */
-      display: flex;
-      flex-direction: column;      /* so we can push answers down */
-    }
 
-    /* Push the answer buttons toward the bottom of the card */
-    .answers { margin-top: auto; }
-  }
 
 .question {
   background   : var(--bg-card);
@@ -102,7 +84,7 @@ h1 {
 
 .question h3 {
   margin: 0 0 1rem;
-  font-size: 1.125rem;
+  font-size: 2rem;
   font-weight: 600;
 }
 
@@ -118,7 +100,7 @@ h1 {
   padding: .5rem .75rem;
   border: 2px solid var(--accent);
   border-radius: .5rem;
-  font-size: 1rem;
+  font-size: 1.5rem;
   background: transparent;
   color: var(--accent);
   cursor: pointer;
@@ -149,13 +131,14 @@ h1 {
 /* ---------- 5. NEW-SET ACTION BUTTON ---------------------- */
 #new-set {
   padding: .65rem 1.2rem;
-  font-size: 1.05rem;
+  font-size: 2rem;
   background: var(--accent);
   color: #fff;
   border: none;
   border-radius: .65rem;
   cursor: pointer;
   margin: 1rem 0 2rem;
+  margin-bottom: 0rem;
   box-shadow: 0 2px 6px rgba(0,0,0,.06);
   transition: background .15s, transform .12s;
 }
@@ -163,18 +146,58 @@ h1 {
 #new-set:hover { background: var(--accent-t); }
 #new-set:active { transform: scale(.97); }
 
+/* medium desktops and up (≥ 768 px) — fill 75 % of viewport */
+@media (min-width: 768px) {
+  #quiz {
+    min-height: 55vh;       /* always use 75 % of screen height */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  /* Stretch every card, keep padding */
+    .question {
+      min-height: 55vh;            /* fills most of the 75 vh quiz area  */
+      display: flex;
+      flex-direction: column;      /* so we can push answers down */
+    }
+
+    /* Push the answer buttons toward the bottom of the card */
+    .answers { margin-top: auto; }
+	
+	.answers button {
+	  flex: 1 1 calc(50% - .75rem);
+	  padding: 1.5rem 1.75rem;
+	  border: 2px solid var(--accent);
+	  border-radius: .5rem;
+	  font-size: 2rem;
+	  background: transparent;
+	  color: var(--accent);
+	  cursor: pointer;
+	  transition: background .15s, color .15s, transform .12s;
+	}
+	
+	p {
+		text-align: center;
+		font-size: 2rem;
+	}
+  }
+
 /* ---------- 6. STICKY FOOTER BANNER AD ------------------- */
-.adsbygoogle {
+/*.adsbygoogle {*/
   /* styles mostly inline in HTML; here we keep it minimal */
-  background: var(--bg-card);
+  /*background: var(--bg-card);
   border-top: 1px solid var(--border);
-}
+}*/
 
 /* ---------- 7. UTILITY ----------------------------------- */
 .text-sub { color: var(--text-sub); }
 
 @media (max-width: 480px) {
-  .answers button { flex: 1 1 100%; }
+  .answers button { 
+	flex: 1 1 100%; 
+	font-size: 1rem;
+	}
 }
 
 /* ---------- TOP BAR ------------------------------------------------ */
@@ -230,7 +253,7 @@ h1 {
   margin-bottom: 1.1rem;
   display: block;
   padding: .5rem 1.25rem;
-  font-size: .95rem;
+  font-size: 2rem;
   background: transparent;
   border: 2px dashed var(--accent);
   color: var(--accent);
@@ -252,19 +275,27 @@ h1 {
 
 /* keep mobile friendliness */
 @media (max-width: 480px) {
-  .hint { width: 60%; margin-left: auto; margin-right: auto;}
+  .hint { 
+	width: 60%;
+	margin-left: auto; 
+	margin-right: auto;
+	font-size: .95rem;
+	}
 }
 
 /* ===========================================================
    MOBILE FIX – keep “New Set” above the banner
    =========================================================== */
 @media (max-width: 480px) {
+	
+	
 
   /* 1. Re-pad the page so content never hides under the ad */
   body { padding-bottom: 0px; }   /* banner 90 px + button 60 px + gap */
 
   /* 2. Pin the New-Set button just above the ad */
   #new-set {
+	font-size: 1rem;
     width: calc(100% - 3rem);       /* leave side gutters */
     max-width: 320px;
     z-index: 999;                   /* above other content, below modal ads */
@@ -286,4 +317,27 @@ h1 {
     font-size: 1.125rem;
     font-weight: 600;
   }
+}
+
+/* ------- STREAK DISPLAY ---------------------------------- */
+
+.streak-badge{
+  display:none;align-items:center;gap:.25rem;
+  font-size:1rem;font-weight:600;color:var(--accent);
+  margin:0.5rem 0;
+}
+
+
+/* ---------- BETTER DESKTOP STREAK ------------------------ */
+.streak-big{
+  display:flex;align-items:center;gap:.35rem;
+  padding:.3rem .75rem;border-radius:2rem;
+  background:var(--bg-card);box-shadow:var(--shadow);
+  font-size:1.4rem;font-weight:700;color:var(--accent);
+}
+.streak-big .divider{opacity:.5;font-size:1.2rem;margin:0 .15rem;}
+
+@media(max-width:640px){          /* mobile */
+  .streak-big{display:none}
+  .streak-badge{display:flex}
 }

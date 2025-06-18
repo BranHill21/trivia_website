@@ -25,17 +25,27 @@
 	<header class="topbar">
 	  <h1>Trivia Time!</h1>
 
-	  <!-- DARK-MODE TOGGLE -->
+	  <!-- STREAK (desktop) -->
+	  <div id="streak-desktop" class="streak-big">
+	    🔥 <span id="streak-now-big">0</span>
+	    <span class="divider">/</span>
+	    <span id="streak-max-big">0</span>
+	  </div>
+
+	  <!-- Hamburger + dark-mode icon stay the same -->
 	  <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode">
 	    <span class="icon-moon"></span>
 	  </button>
 	</header>
-
+	<!-- MOBILE STREAK -->
+	<div id="streak-mobile" class="streak-badge">
+	  🔥 <span id="streak-now">0</span> | Max <span id="streak-max">0</span>
+	</div>
   <!-- QUIZ CONTAINER -->
   <main id="quiz"></main>
 
   <!-- “NEW SET” BUTTON -->
-  <button id="new-set" class="action">New&nbsp;Set</button>
+  <button id="new-set" class="action">Next&nbsp;Set</button>
 
   <!-- STICKY BANNER AD (replace placeholders) -->
   <ins class="adsbygoogle"

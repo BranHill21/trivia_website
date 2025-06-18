@@ -1,122 +1,118 @@
 /*  src/main/resources/static/js/landing.js
  *  =============================================================
- *  • Persists quiz in localStorage
- *  • Rewarded-ad gate for new sets
- *  • Interstitial every 10 answers
- *  • Dark-mode toggle (auto + manual)
- *  • “50-50” hint button – removes one wrong answer once per Q
- *  • Highlights all answers after selection
+ *  • Streak & longest streak (persists per session)
+ *  • Perfect-set difficulty ladder: easy → medium → any
+ *  • “New Set” button appears only after finishing current set
+ *  • Interstitial every 10 answers + rewarded gate
+ *  • Mobile + desktop streak UI (🔥 current / max)
+ *  • Dark-mode toggle, 50-50 hint, responsive layout
  *  ============================================================= */
 
 document.addEventListener('DOMContentLoaded', async () => {
-	/* ---------- THEME -------- */
-	const html = document.documentElement;
-	const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-	const savedTheme  = localStorage.getItem('theme'); // 'light' | 'dark' | null
-
-	if ((savedTheme ?? (prefersDark ? 'dark' : 'light')) === 'dark') {
-	  html.classList.add('dark');
-	}
-	document.getElementById('theme-toggle').addEventListener('click', () => {
-	  const dark = html.classList.toggle('dark');
-	  localStorage.setItem('theme', dark ? 'dark' : 'light');
-	});
-
-  /* ---------- constants & helpers ---------- */
-  const LS_Q     = 'quiz.questions';
-  const LS_I     = 'quiz.index';
-  const LS_ULOCK = 'quiz.unlocked';
-  const AMOUNT   = 3;
-  const INTERSTITIAL_EVERY = 10;
-
-  const root   = document.getElementById('quiz');
-  const btnNew = document.getElementById('new-set');
-  let questions = loadQuestions();
-  let index     = +localStorage.getItem(LS_I) || 0;
-  let answered  = 0;
-
-  /* ---------- initial load ---------- */
-  if (!questions.length) {
-    questions = await fetchQuestions(AMOUNT);
-    saveQuestions(questions);
+  /* ---------- THEME --------------------------------------- */
+  const html = document.documentElement;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const savedTheme  = localStorage.getItem('theme');
+  if ((savedTheme ?? (prefersDark ? 'dark' : 'light')) === 'dark') {
+    html.classList.add('dark');
   }
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const d = html.classList.toggle('dark');
+    localStorage.setItem('theme', d ? 'dark' : 'light');
+  });
+
+  /* ---------- CONSTANTS ----------------------------------- */
+  const AMOUNT        = 3;
+  const INTER_AD      = 10;
+  const LS_QUEST      = 'quiz.questions';
+  const LS_INDEX      = 'quiz.index';
+  const LS_ULOCK      = 'quiz.unlocked';
+  const LS_STREAK     = 'quiz.streak';
+  const LS_HIGH       = 'quiz.high';
+  const LS_DIFF       = 'quiz.diff';
+
+  /* ---------- DOM ELEMENTS -------------------------------- */
+  const root       = document.getElementById('quiz');
+  const btnNew     = document.getElementById('new-set');
+  const streakBig  = document.getElementById('streak-desktop');      // desktop pill
+  const sNowMobile = document.getElementById('streak-now');          // mobile badge
+  const sMaxMobile = document.getElementById('streak-max');
+
+  /* ---------- STATE --------------------------------------- */
+  let streak      = +localStorage.getItem(LS_STREAK) || 0;
+  let high        = +localStorage.getItem(LS_HIGH)   || 0;
+  let difficulty  = localStorage.getItem(LS_DIFF)    || 'easy';
+  if (streak === 0) difficulty = 'easy';                       // safety reset
+
+  let questions   = loadJSON(LS_QUEST) || [];
+  let index       = +(localStorage.getItem(LS_INDEX) || 0);
+  let correctInSet= 0;                                          // NEW counter
+  let answered    = 0;                                          // for interstitial pacing
+
+  /* ---------- INIT ---------------------------------------- */
+  updateStreakUI();
+  if (!questions.length) await startNewSet();
   renderQuestion();
 
-  /* ---------- new-set button ---------- */
+  /* ---------- NEW-SET BUTTON ------------------------------ */
+  /*btnNew.style.display = 'none';*/
   btnNew.onclick = async () => {
     if (localStorage.getItem(LS_ULOCK) !== 'true') {
       await showRewardedAd();
       localStorage.setItem(LS_ULOCK, 'true');
     }
-    questions = await fetchQuestions(AMOUNT);
-    saveQuestions(questions);
-    index = 0;
+    await startNewSet();
     renderQuestion();
   };
 
-  /* ---------- fetch wrapper ---------- */
-  async function fetchQuestions(amount) {
-    const res = await fetch(`/api/questions?amount=${amount}`);
-    if (!res.ok) throw new Error('API error ' + res.status);
-    return res.json();
-  }
-
-  /* ---------- persistence helpers ---------- */
-  function saveQuestions(qs) {
-    localStorage.setItem(LS_Q, JSON.stringify(qs));
-    localStorage.setItem(LS_I, '0');
-    localStorage.setItem(LS_ULOCK, 'false');
-  }
-  function loadQuestions() {
-    const raw = localStorage.getItem(LS_Q);
-    return raw ? JSON.parse(raw) : [];
-  }
-
-  /* ---------- render single question ---------- */
+  /* ---------- RENDER QUESTION ----------------------------- */
   function renderQuestion() {
     root.innerHTML = '';
+
+    /* Set finished -------------------------------------------------- */
     if (index >= questions.length) {
-      root.innerHTML = '<p class="text-sub">All done! Click “New Set”.</p>';
+      root.innerHTML =
+        `<p class="text-sub">Set complete! 🔥 Current streak ${streak}</p>`;
+      btnNew.style.display = 'block';
       return;
     }
+	else {
+		btnNew.style.display = 'none';
+	}
 
-    const q = questions[index];
-    const card = document.createElement('div');
+
+    /* Build card ---------------------------------------------------- */
+    const q   = questions[index];
+    const card= document.createElement('div');
     card.className = 'question';
     card.innerHTML = `<h3>Q${index + 1}. ${q.question}</h3>`;
 
     const btnBox = document.createElement('div');
     btnBox.className = 'answers';
 
-    /* shuffle answers */
-    const answers = [q.correctAnswer, ...q.incorrectAnswers]
-      .sort(() => Math.random() - 0.5);
+    [...q.incorrectAnswers, q.correctAnswer]
+      .sort(() => Math.random() - 0.5)
+      .forEach(ans => {
+        const b = document.createElement('button');
+        b.textContent = ans;
+        b.onclick = () => handleAnswer(b, ans === q.correctAnswer, q, btnBox);
+        btnBox.appendChild(b);
+      });
 
-    answers.forEach(ans => {
-      const btn = document.createElement('button');
-      btn.textContent = ans;
-      btn.onclick = () => handleClick(btn, ans === q.correctAnswer, btnBox, q);
-      btnBox.appendChild(btn);
-    });
-
-    /* hint button (50-50)  */
+    /* 50-50 hint ---------------------------------------------------- */
     if (q.incorrectAnswers.length > 1) {
       const hint = document.createElement('button');
       hint.className = 'hint';
       hint.textContent = 'Give me a hint';
-	  hint.onclick = () => {
-	    const wrongBtns = [...btnBox.children].filter(
-	      b => b.textContent !== q.correctAnswer && !b.dataset.removed
-	    );
-	    if (wrongBtns.length) {
-	      /* choose random wrong button */
-	      const remove = wrongBtns[Math.floor(Math.random() * wrongBtns.length)];
-	      remove.style.visibility = 'hidden';
-	      remove.dataset.removed = 'true';
-	      hint.disabled = true;
-	    }
-	  };
-
+      hint.onclick = () => {
+        const wrong = [...btnBox.children].filter(
+          b => b.textContent !== q.correctAnswer && b.style.visibility !== 'hidden'
+        );
+        if (wrong.length) {
+          wrong[Math.floor(Math.random() * wrong.length)].style.visibility = 'hidden';
+          hint.disabled = true;
+        }
+      };
       card.appendChild(hint);
     }
 
@@ -124,54 +120,102 @@ document.addEventListener('DOMContentLoaded', async () => {
     root.appendChild(card);
   }
 
-  /* ---------- answer handler ---------- */
-  function handleClick(chosenBtn, isCorrect, btnBox, q) {
-    if (btnBox.classList.contains('done')) return; // already answered
+  /* ---------- ANSWER HANDLER ------------------------------------- */
+  function handleAnswer(btn, isCorrect, q, btnBox) {
+    if (btnBox.classList.contains('done')) return;
 
-    /* highlight all buttons */
+    /* colour all buttons */
     [...btnBox.children].forEach(b => {
-      const correct = b.textContent === q.correctAnswer;
-      b.classList.add(correct ? 'correct' : 'incorrect');
+      const good = b.textContent === q.correctAnswer;
+      b.classList.add(good ? 'correct' : 'incorrect');
       b.disabled = true;
     });
-    chosenBtn.classList.add('chosen'); // emphasise user choice
+    btn.classList.add('chosen');
     btnBox.classList.add('done');
 
     answered++;
-    if (answered % INTERSTITIAL_EVERY === 0) showInterstitialAd();
+    if (answered % INTER_AD === 0) showInterstitialAd();
 
-    index++;
-    localStorage.setItem(LS_I, index);
+    /* streak & difficulty logic */
+    if (isCorrect) {
+      streak++; high = Math.max(high, streak);
+      correctInSet++;
+    } else {
+      streak = 0; difficulty = 'easy'; correctInSet = 0;
+    }
+    persistStreak(); updateStreakUI();
+
+    index++; localStorage.setItem(LS_INDEX, index);
+
+    /* End of set ---------------------------------------------------- */
+    if (index >= questions.length) {
+      if (correctInSet === AMOUNT) {            // perfect!
+        if (difficulty === 'easy')      difficulty = 'medium';
+        else if (difficulty === 'medium') difficulty = 'any';
+      }
+    }
+
     setTimeout(renderQuestion, 1200);
   }
 
-  /* ---------- Ad helpers ---------- */
-  let _rewardResolve = null;
+  /* ---------- START A NEW SET ------------------------------------ */
+  async function startNewSet() {
+    questions = await fetchQuestions(AMOUNT, difficulty);
+    saveJSON(LS_QUEST, questions);
+    index = 0; correctInSet = 0;
+    localStorage.setItem(LS_INDEX, '0');
+    localStorage.setItem(LS_ULOCK, 'false');
+    btnNew.style.display = 'none';
+	renderQuestion();
+  }
 
+  /* ---------- FETCH QUESTIONS ------------------------------------ */
+  async function fetchQuestions(amount, diff) {
+    let url = `/api/questions?amount=${amount}`;
+    if (diff !== 'any') url += `&difficulty=${diff}`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('API ' + r.status);
+    return r.json();
+  }
+
+  /* ---------- STREAK UI ------------------------------------------ */
+  function updateStreakUI() {
+    streakBig.innerHTML =
+      `Current 🔥 <span id="streak-now-big">${streak}</span> / Max <span id="streak-max-big">${high}</span>`;
+    sNowMobile.textContent = streak;
+    sMaxMobile.textContent = high;
+  }
+
+  function persistStreak() {
+    localStorage.setItem(LS_STREAK, streak);
+    localStorage.setItem(LS_HIGH,   high);
+    localStorage.setItem(LS_DIFF,   difficulty);
+  }
+
+  /* ---------- STORAGE HELPERS ------------------------------------ */
+  function saveJSON(k, obj) { localStorage.setItem(k, JSON.stringify(obj)); }
+  function loadJSON(k) { const r = localStorage.getItem(k); return r ? JSON.parse(r) : null; }
+
+  /* ---------- ADS (unchanged) ------------------------------------ */
+  let _rewardResolve = null;
   function showRewardedAd() {
     return new Promise(res => {
       if (window.googletag && window.rewardedSlot) {
         _rewardResolve = res;
         googletag.cmd.push(() => googletag.pubads().refresh([rewardedSlot]));
-      } else {
-        console.warn('Rewarded ad not configured – auto-continue');
-        res();
-      }
+      } else res();
     });
   }
-
   function showInterstitialAd() {
     if (window.googletag && window.interstitialSlot) {
-      googletag.cmd.push(() =>
-        googletag.pubads().refresh([interstitialSlot]));
+      googletag.cmd.push(() => googletag.pubads().refresh([interstitialSlot]));
     }
   }
-
   if (window.googletag) {
     googletag.cmd.push(() => {
       if (window.rewardedSlot) {
         rewardedSlot.addEventListener('rewardedSlotClosed', () => {
-          if (_rewardResolve) _rewardResolve(), _rewardResolve = null;
+          if (_rewardResolve) { _rewardResolve(); _rewardResolve = null; }
         });
       }
     });
