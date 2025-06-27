@@ -80,10 +80,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   /* ---------- NEW-SET BUTTON ------------------------------ */
   /*btnNew.style.display = 'none';*/
   btnNew.onclick = async () => {
-    if (localStorage.getItem(LS_ULOCK) !== 'true') {
+	/*uncomment for ads*/
+    /*if (localStorage.getItem(LS_ULOCK) !== 'true') {
       await showRewardedAd();
       localStorage.setItem(LS_ULOCK, 'true');
-    }
+    }*/
     await startNewSet();
     renderQuestion();
   };
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function loadJSON(k) { const r = localStorage.getItem(k); return r ? JSON.parse(r) : null; }
 
   /* ---------- ADS (unchanged) ------------------------------------ */
-  let _rewardResolve = null;
+  /*let _rewardResolve = null;
   function showRewardedAd() {
     return new Promise(res => {
       if (window.googletag && window.rewardedSlot) {
@@ -242,5 +243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
     });
-  }
+  }*/
+  
+  
 });

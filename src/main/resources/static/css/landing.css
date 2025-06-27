@@ -378,3 +378,9 @@ h1 {
   z-index:1000;                                /* just under .side-menu (1001) */
 }
 .menu-overlay.show{opacity:1;pointer-events:auto}
+
+#homeButton {
+	color: var(--accent);
+	font-weight: bold;
+}
+

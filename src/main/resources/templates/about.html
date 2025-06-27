@@ -1,8 +1,74 @@
 <!DOCTYPE html><html lang="en">
 <head><meta charset="UTF-8"><title>About Us</title>
-<link rel="stylesheet" href="/css/landing.css"></head>
-<body><main id="quiz" style="max-width:680px">
+<link rel="stylesheet" href="/css/landing.css">
+</head>
+<body><main style="max-width:680px">
+	<header class="topbar">
+				  <h1>Trivia Time!</h1>
+
+				  <!-- Hamburger + dark-mode icon stay the same -->
+				  <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode">
+				    <span class="icon-moon"></span>
+				  </button>
+				  
+				  <!-- DROPDOWN TOGGLE -->
+				  <button id="menu-btn" class="menu-btn" aria-label="Menu">
+				    ☰
+				  </button>
+				</header>
+				
+				<!-- SIDE MENU (hidden by default) -->
+				<nav id="side-menu" class="side-menu">
+				  <a id="homeButton" href="/">Trivia!</a>
+				  <a href="/about">About</a>
+				  <a href="/privacy">Privacy</a>
+				  <a href="/terms">Terms</a>
+				  <a href="/contact">Contact</a>
+				</nav>
+				
+				<!-- CLICK-OFF OVERLAY -->
+				<div id="menu-overlay" class="menu-overlay"></div>
 <h2>About Trivia Time!</h2>
 <p>We’re a small indie project built by YOUR NAME to deliver free, ad-supported
  trivia quizzes, powered by the Open TDB API.</p>
-</main></body></html>
+</main>
+<script>
+	/* ---------- THEME --------------------------------------- */
+	  const html = document.documentElement;
+	  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	  const savedTheme  = localStorage.getItem('theme');
+	  if ((savedTheme ?? (prefersDark ? 'dark' : 'light')) === 'dark') {
+	    html.classList.add('dark');
+	  }
+	  document.getElementById('theme-toggle').addEventListener('click', () => {
+	    const d = html.classList.toggle('dark');
+	    localStorage.setItem('theme', d ? 'dark' : 'light');
+	  });
+	  
+	  /* ----- slide-out menu toggle & overlay ----- */
+	  const menuBtn  = document.getElementById('menu-btn');
+	  const sideMenu = document.getElementById('side-menu');
+	  const overlay  = document.getElementById('menu-overlay');
+
+	  function openMenu(){
+	    sideMenu.classList.add('open');
+	    overlay.classList.add('show');
+	  }
+	  function closeMenu(){
+	    sideMenu.classList.remove('open');
+	    overlay.classList.remove('show');
+	  }
+
+	  menuBtn.addEventListener('click', () =>
+	    sideMenu.classList.contains('open') ? closeMenu() : openMenu()
+	  );
+
+	  overlay.addEventListener('click', closeMenu);       // tap anywhere to close
+	  sideMenu.querySelectorAll('a').forEach(link =>
+	    link.addEventListener('click', closeMenu)         // tap a link → close
+	  );
+</script>
+</body>
+
+
+</html>

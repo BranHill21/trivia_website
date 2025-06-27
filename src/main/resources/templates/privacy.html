@@ -3,7 +3,33 @@
 	<title>Privacy Policy</title>
 <link rel="stylesheet" href="/css/landing.css">
 </head>
-<body><main  style="max-width:680px">
+<body>
+	<main  style="max-width:680px">
+		<header class="topbar">
+			  <h1>Trivia Time!</h1>
+
+			  <!-- Hamburger + dark-mode icon stay the same -->
+			  <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark mode">
+			    <span class="icon-moon"></span>
+			  </button>
+			  
+			  <!-- DROPDOWN TOGGLE -->
+			  <button id="menu-btn" class="menu-btn" aria-label="Menu">
+			    ☰
+			  </button>
+			</header>
+			
+			<!-- SIDE MENU (hidden by default) -->
+			<nav id="side-menu" class="side-menu">
+			  <a id="homeButton" href="/">Trivia!</a>
+			  <a href="/about">About</a>
+			  <a href="/privacy">Privacy</a>
+			  <a href="/terms">Terms</a>
+			  <a href="/contact">Contact</a>
+			</nav>
+			
+			<!-- CLICK-OFF OVERLAY -->
+			<div id="menu-overlay" class="menu-overlay"></div>
 <h2>Privacy Policy</h2>
 <p>Last updated: 18 June 2025</p>
 <p>At Trivia Time! (“<strong>we</strong>”, “<strong>our</strong>”, or “<strong>us</strong>”)
@@ -30,4 +56,41 @@ via <a href="https://adssettings.google.com">Ads Settings</a>.</p>
 
 <h3>4. Contact</h3>
 <p>Questions? Email <a href="mailto:hello@triviatime.com">hello@triviatime.com</a></p>
-</main></body></html>
+</main>
+<script>
+	/* ---------- THEME --------------------------------------- */
+	  const html = document.documentElement;
+	  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	  const savedTheme  = localStorage.getItem('theme');
+	  if ((savedTheme ?? (prefersDark ? 'dark' : 'light')) === 'dark') {
+	    html.classList.add('dark');
+	  }
+	  document.getElementById('theme-toggle').addEventListener('click', () => {
+	    const d = html.classList.toggle('dark');
+	    localStorage.setItem('theme', d ? 'dark' : 'light');
+	  });
+	  
+	  /* ----- slide-out menu toggle & overlay ----- */
+	  const menuBtn  = document.getElementById('menu-btn');
+	  const sideMenu = document.getElementById('side-menu');
+	  const overlay  = document.getElementById('menu-overlay');
+
+	  function openMenu(){
+	    sideMenu.classList.add('open');
+	    overlay.classList.add('show');
+	  }
+	  function closeMenu(){
+	    sideMenu.classList.remove('open');
+	    overlay.classList.remove('show');
+	  }
+
+	  menuBtn.addEventListener('click', () =>
+	    sideMenu.classList.contains('open') ? closeMenu() : openMenu()
+	  );
+
+	  overlay.addEventListener('click', closeMenu);       // tap anywhere to close
+	  sideMenu.querySelectorAll('a').forEach(link =>
+	    link.addEventListener('click', closeMenu)         // tap a link → close
+	  );
+</script>
+</body></html>
