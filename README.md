@@ -1,2 +1,4 @@
-# Daily Trivia
-This is a daily trivia website soon to be deployed that will allow users to complete daily trivia with specific categories.
+# Trivia Time!
+This is an unlimited trivia website currently deployed at https://endless-trivia-feb0b222bfb2.herokuapp.com/
+
+Test your knowledege and become familiar with questions that you don't know and have not seen before.
