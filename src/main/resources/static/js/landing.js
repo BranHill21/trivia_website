@@ -1,12 +1,4 @@
-/*  src/main/resources/static/js/landing.js
- *  =============================================================
- *  • Streak & longest streak (persists per session)
- *  • Perfect-set difficulty ladder: easy → medium → any
- *  • “New Set” button appears only after finishing current set
- *  • Interstitial every 10 answers + rewarded gate
- *  • Mobile + desktop streak UI (🔥 current / max)
- *  • Dark-mode toggle, 50-50 hint, responsive layout
- *  ============================================================= */
+/*  src/main/resources/static/js/landing.js */
 
 document.addEventListener('DOMContentLoaded', async () => {
   /* ---------- THEME --------------------------------------- */
@@ -158,7 +150,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnBox.classList.add('done');
 
     answered++;
-    if (answered % INTER_AD === 0) showInterstitialAd();
+	/*for future ads*/
+    /*if (answered % INTER_AD === 0) showInterstitialAd();*/
 
     /* streak & difficulty logic */
     if (isCorrect) {
